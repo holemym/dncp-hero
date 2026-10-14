@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/home/",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/befund",

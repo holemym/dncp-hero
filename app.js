@@ -34,30 +34,46 @@ const io = new IntersectionObserver((entries) => {
 }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
 document.querySelectorAll('[data-reveal]').forEach((el) => (reduce ? el.classList.add('in') : io.observe(el)));
 
-// Press room: the number rolls and the name swaps to the line under the pointer; every line stays readable without it.
+// Press room: the line under a moving pointer becomes active after a short dwell; scrolling past rows with a resting
+// pointer changes nothing. Every line stays readable without it.
 const big = document.querySelector('[data-press-big]');
 const odo = document.querySelector('[data-odometer]');
+const list = document.querySelector('.press__list');
 const lines = [...document.querySelectorAll('.press__list li')];
-let onIdx = -1;
-const setOn = (k) => {
+let onIdx = -1, shown = '', swapping = false, dwell = 0;
+const swapTo = (name) => {
+  // one crossfade at a time; a newer pick only changes where it lands, never restarts it
+  if (swapping || name === shown) return;
+  swapping = true;
+  big.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: 'ease-out', fill: 'forwards' }).finished.then(() => {
+    const target = lines[onIdx].querySelector('.press__name').textContent;
+    big.textContent = shown = target;
+    return big.animate([{ opacity: 0, transform: 'translateY(.12em)' }, { opacity: 1, transform: 'none' }],
+      { duration: 320, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' }).finished;
+  }).catch(() => {}).finally(() => {
+    swapping = false;
+    const latest = lines[onIdx].querySelector('.press__name').textContent;
+    if (latest !== shown) swapTo(latest);
+  });
+};
+const setOn = (k, instant) => {
   if (k === onIdx) return;
-  const first = onIdx < 0;
   onIdx = k;
   lines.forEach((l, j) => l.classList.toggle('is-on', j === k));
   if (odo) odo.dataset.value = String(k + 1);
   if (!big) return;
   const name = lines[k].querySelector('.press__name').textContent;
-  if (first || reduce) { big.textContent = name; return; }
-  // swap: the old name leaves upward through its mask, the new one rises into place
-  big.getAnimations().forEach((a) => a.cancel());
-  big.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-105%)' }], { duration: 180, easing: 'cubic-bezier(.6,0,.4,1)' })
-    .finished.then(() => {
-      big.textContent = name;
-      big.animate([{ transform: 'translateY(105%)' }, { transform: 'translateY(0)' }], { duration: 320, easing: 'cubic-bezier(.22,1,.36,1)' });
-    }).catch(() => {});
+  if (instant || reduce) { big.textContent = shown = name; return; }
+  swapTo(name);
 };
-lines.forEach((li, k) => li.addEventListener('pointerenter', () => setOn(k)));
-if (lines.length) setOn(0);
+if (list) list.addEventListener('pointermove', (e) => {
+  const li = e.target.closest('li');
+  if (!li) return;
+  const k = lines.indexOf(li);
+  clearTimeout(dwell);
+  dwell = setTimeout(() => setOn(k), 120);
+});
+if (lines.length) setOn(0, true);
 
 // Consent: decline first, asked once; the demo loads no trackers either way.
 const consent = document.querySelector('[data-consent]');
@@ -71,10 +87,6 @@ if (consent) {
     consent.querySelector('[data-consent-yes]').addEventListener('click', () => close('yes'));
   }
 }
-
-// Grain runs only while the hero is on screen (it is the one continuous animation on the page).
-const heroEl = document.querySelector('.hero');
-if (heroEl) new IntersectionObserver(([e]) => heroEl.classList.toggle('is-seen', e.isIntersecting)).observe(heroEl);
 
 // Scroll-linked signature + glint: one lerped loop that sleeps when nothing is moving.
 const hero = document.querySelector('.hero');
