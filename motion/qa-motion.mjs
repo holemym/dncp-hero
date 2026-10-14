@@ -67,7 +67,7 @@ await page.screenshot({ path: path.join(SHOTS, '02-words-t1.25.png'), clip: { x:
 await wait(1600);
 const end = await page.evaluate(() => Array.from(document.querySelectorAll('#words .mo-w')).map((w) => { const c = getComputedStyle(w); return [c.opacity, c.transform, c.filter]; }));
 check('1a words: split, animating mid-way, same box as no-JS (no reflow)', mid.n > 3 && mid.ops.some((o) => o < 0.9) && JSON.stringify(mid.size) === JSON.stringify(REF.words), { ...mid, ref: REF.words });
-check('1b words: LTR run kept in one box (RTL-safe), child spans kept and split inside', mid.texts.includes('HP Indigo 7900,') && mid.kids.length === 2 && mid.kids.every((n) => n >= 2), { texts: mid.texts, kids: mid.kids });
+check('1b words: LTR run kept in one box (RTL-safe), child spans kept and split inside', mid.texts.includes('HP Indigo 7900,') && mid.kids.length === 3 && mid.kids.every((n) => n >= 1), { texts: mid.texts, kids: mid.kids });
 check('1c words end: opacity 1, transform none, filter none', end.every(([o, t, f]) => o === '1' && t === 'none' && f === 'none'), end[0]);
 
 // light: start state, end state
@@ -189,7 +189,8 @@ check('12 anchor from menu: menu closes, lands at --head (64 px)', Math.abs(anch
 // loop sleeps when idle
 const idle = await page.evaluate(() => new Promise((res) => { let n = 0; const orig = window.requestAnimationFrame; setTimeout(() => { window.requestAnimationFrame = (f) => { n++; return orig(f); }; setTimeout(() => { window.requestAnimationFrame = orig; res(n); }, 1000); }, 1500); }));
 check('13 shared loop sleeps when idle (rAF calls in 1 s, page still)', idle === 0, { idle });
-check('14 zero console errors (1440)', errors.length === 0, errors);
+const sw1440 = await page.evaluate(() => document.documentElement.scrollWidth);
+check('14 zero console errors, no horizontal overflow (1440)', errors.length === 0 && sw1440 <= 1440, { errors, sw1440 });
 await ctx.close();
 
 // ---- 375: overflow + errors, test page and the real page

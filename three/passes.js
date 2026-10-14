@@ -227,7 +227,7 @@ export function mountPasses(container, { base } = {}) {
     scene.add(m);
     return m;
   };
-  const sheetShadowNear = shadowPlane(SHEET_W + 0.05, SHEET_H + 0.05, SHEET_W / (SHEET_W + 0.05), SHEET_H / (SHEET_H + 0.05));
+  const sheetShadowNear = shadowPlane(SHEET_W + 0.1, SHEET_H + 0.1, (SHEET_W - 0.04) / (SHEET_W + 0.1), (SHEET_H - 0.04) / (SHEET_H + 0.1));
   const sheetShadowFar = shadowPlane(SHEET_W + 0.42, SHEET_H + 0.42, 0.55, 0.62);
   sheetShadowNear.position.y = GROUND_Y + 0.0006;
   sheetShadowFar.position.y = GROUND_Y + 0.0004;
@@ -388,9 +388,9 @@ export function mountPasses(container, { base } = {}) {
     // Contact shadow under the sheet: wide and faint while it is up in the press, tight once it lies on the table.
     const lift = sheet.position.y - (GROUND_Y + 0.003);
     const air = clamp01(lift / (-GROUND_Y));
-    sheetShadowNear.position.x = sx + 0.012; sheetShadowNear.position.z = -0.01;
+    sheetShadowNear.position.x = sx + 0.008; sheetShadowNear.position.z = -0.006;
     sheetShadowFar.position.x = sx + 0.03 + 0.08 * air; sheetShadowFar.position.z = -0.03 - 0.05 * air;
-    sheetShadowNear.material.opacity = 0.26 * (1 - air);
+    sheetShadowNear.material.opacity = 0.17 * (1 - air);
     sheetShadowFar.material.opacity = 0.05 + 0.07 * air;
 
     // Camera. Square to the feed, so the stations stand parallel and the sheet crosses the frame right to left.
