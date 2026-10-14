@@ -60,14 +60,14 @@ await page.screenshot({ path: path.join(SHOTS, '01-words-t0.35.png'), clip: { x:
 const mid = await page.evaluate(() => {
   const ws = Array.from(document.querySelectorAll('#words .mo-w'));
   const r = document.getElementById('words').getBoundingClientRect();
-  return { n: ws.length, ops: ws.map((w) => +(+getComputedStyle(w).opacity).toFixed(2)), size: [Math.round(r.width * 10) / 10, Math.round(r.height * 10) / 10], texts: ws.map((w) => w.textContent), kids: Array.from(document.querySelectorAll('#words > span')).map((k) => k.querySelectorAll('.mo-w').length) };
+  return { n: ws.length, ops: ws.map((w) => +(+getComputedStyle(w).opacity).toFixed(2)), size: [Math.round(r.width * 10) / 10, Math.round(r.height * 10) / 10], texts: ws.map((w) => w.textContent), ltrOrder: (() => { const ws = Array.from(document.querySelectorAll('#words .mo-ltr .mo-w')).map((w) => w.getBoundingClientRect().left); return ws.length === 3 && ws[0] < ws[1] && ws[1] < ws[2]; })(), kids: Array.from(document.querySelectorAll('#words > span')).map((k) => k.querySelectorAll('.mo-w').length) };
 });
 await wait(900);
 await page.screenshot({ path: path.join(SHOTS, '02-words-t1.25.png'), clip: { x: 0, y: 0, width: 1440, height: 700 } });
 await wait(1600);
 const end = await page.evaluate(() => Array.from(document.querySelectorAll('#words .mo-w')).map((w) => { const c = getComputedStyle(w); return [c.opacity, c.transform, c.filter]; }));
 check('1a words: split, animating mid-way, same box as no-JS (no reflow)', mid.n > 3 && mid.ops.some((o) => o < 0.9) && JSON.stringify(mid.size) === JSON.stringify(REF.words), { ...mid, ref: REF.words });
-check('1b words: LTR run kept in one box (RTL-safe), child spans kept and split inside', mid.texts.includes('HP Indigo 7900,') && mid.kids.length === 3 && mid.kids.every((n) => n >= 1), { texts: mid.texts, kids: mid.kids });
+check('1b words: LTR run kept in one box (RTL-safe), child spans kept and split inside', mid.texts.join('|').includes('HP|Indigo|7900|,') && mid.ltrOrder && mid.kids.length === 3 && mid.kids.every((n) => n >= 1), { texts: mid.texts, kids: mid.kids });
 check('1c words end: opacity 1, transform none, filter none', end.every(([o, t, f]) => o === '1' && t === 'none' && f === 'none'), end[0]);
 
 // light: start state, end state

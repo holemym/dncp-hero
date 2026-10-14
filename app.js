@@ -22,6 +22,12 @@ try {
   console.warn('motion engine unavailable', err);
 }
 
+// Menu button: names what it does next; the header stays above the overlay so it is the close control too.
+const menuBtn = document.querySelector('[data-menu-open]');
+if (menuBtn) new MutationObserver(() => {
+  menuBtn.textContent = menuBtn.getAttribute('aria-expanded') === 'true' ? 'סגירה' : 'תפריט';
+}).observe(menuBtn, { attributes: true, attributeFilter: ['aria-expanded'] });
+
 // Reveal: rows and photos arrive in the feed direction, once (children are clipped; see styles.css).
 const io = new IntersectionObserver((entries) => {
   for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
@@ -65,6 +71,10 @@ if (consent) {
     consent.querySelector('[data-consent-yes]').addEventListener('click', () => close('yes'));
   }
 }
+
+// Grain runs only while the hero is on screen (it is the one continuous animation on the page).
+const heroEl = document.querySelector('.hero');
+if (heroEl) new IntersectionObserver(([e]) => heroEl.classList.toggle('is-seen', e.isIntersecting)).observe(heroEl);
 
 // Scroll-linked signature + glint: one lerped loop that sleeps when nothing is moving.
 const hero = document.querySelector('.hero');

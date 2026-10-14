@@ -35,12 +35,17 @@ ol,ul{list-style:none}
 /* ---------- hero: tall track, sticky stage ---------- */
 .hero{position:relative}
 .js .hero{height:300vh}
-.hero__stage{position:relative;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:clamp(.75rem,1.5vw,1.25rem);height:calc(100svh - var(--head,77px));min-height:560px;padding:clamp(1rem,2vw,2rem) var(--gutter) clamp(1rem,2.5vw,2rem)}
+.hero__stage{position:relative;overflow:hidden;background:var(--paper);display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:clamp(.75rem,1.5vw,1.25rem);height:calc(100svh - var(--head,77px));min-height:560px;padding:clamp(1rem,2vw,2rem) var(--gutter) clamp(1rem,2.5vw,2rem)}
 .js .hero__stage{position:sticky;top:var(--head,77px)}
 .slug{font:400 .8125rem/1.4 var(--f-mono);color:var(--ink-2);display:flex;gap:.75rem;flex-wrap:wrap;padding-bottom:.6rem;border-bottom:1px solid var(--ink-2)}
 .hero__title{font:700 clamp(4.5rem,12.4vw,15rem)/.82 var(--f-display);letter-spacing:-.01em}
 .hero__title>span{white-space:nowrap}
 .hero__press{position:relative;min-height:0}
+/* grain: one film layer over paper and press together; steps so it flickers like film, not like a video */
+.hero__stage::after{content:"";position:absolute;inset:-60px;z-index:2;pointer-events:none;background:url(img/grain-256.png) 0 0/256px 256px repeat;opacity:.14;animation:grain .9s steps(6) infinite}
+.hero__stage>*{position:relative;z-index:1}
+.hero:not(.is-seen) .hero__stage::after{animation-play-state:paused}
+@keyframes grain{0%{transform:translate(0,0)}17%{transform:translate(-31px,18px)}33%{transform:translate(22px,-37px)}50%{transform:translate(-14px,41px)}67%{transform:translate(37px,9px)}83%{transform:translate(-40px,-23px)}100%{transform:translate(0,0)}}
 .hero__press canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .hero__fallback{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center}
 .hero--live .hero__fallback{opacity:0}
@@ -137,7 +142,7 @@ ol,ul{list-style:none}
 /* ---------- header menu button (phones) ---------- */
 .head__menu{display:none;min-height:44px;padding:.4rem .9rem;border:0;border-radius:var(--radius);background:none;box-shadow:inset 0 0 0 1.5px var(--ink);font:600 1rem/1 var(--f-body);color:var(--ink);cursor:pointer}
 .head{transition:transform .45s var(--ease-feed)}
-.menu{position:fixed;inset:0;z-index:40;background:var(--paper);display:flex;flex-direction:column;justify-content:space-between;padding:calc(var(--head,69px) + 2rem) var(--gutter) 2rem}
+.menu{position:fixed;inset:0;z-index:15;background:var(--paper);display:flex;flex-direction:column;justify-content:space-between;padding:calc(var(--head,69px) + 2rem) var(--gutter) 2rem}
 .menu[hidden]{display:none}
 .menu__links{display:flex;flex-direction:column}
 .menu__links a{font:700 clamp(3rem,14vw,5rem)/1 var(--f-display);text-decoration:none;padding:.35rem 0;border-bottom:1px solid var(--ink)}
@@ -178,6 +183,7 @@ ol,ul{list-style:none}
   .js [data-reveal]>*{clip-path:none;transition:none}
   .btn,.ticket__name{transition:none}
   .foil__glint{display:none}
+  .hero__stage::after{animation:none}
 }
 
 /* ---------- narrow ---------- */
@@ -196,7 +202,7 @@ ol,ul{list-style:none}
 @media (max-width:760px){
   .head__tel,.head__cta{display:none}
   .head{justify-content:space-between}
-  .head__menu{display:inline-flex;align-items:center}
+  .js .head__menu{display:inline-flex;align-items:center}
   .consent{inset-inline:var(--gutter);bottom:calc(72px + .75rem);max-width:none}
   .head__logo img{height:48px}
   .hero__stage{height:calc(100svh - var(--head,69px) - 72px)}

@@ -86,18 +86,65 @@ function paperNormalTexture(size = 256) {
   return tex;
 }
 
-// Lathe-turned steel: fine roughness rings along the roller's length, low variation (0.30-0.40).
-function brushedRoughness() {
-  const n = 256, data = new Uint8Array(4 * n * 4);
-  for (let y = 0; y < n; y++) {
-    const v = 0.35 + 0.05 * Math.sin(y * 12.9898 * 0.37) * Math.sin(y * 0.71 + 1.3);
-    for (let x = 0; x < 4; x++) { const i = (y * 4 + x) * 4; data[i] = data[i + 1] = data[i + 2] = Math.round(v * 255); data[i + 3] = 255; }
+// Tileable value noise on a size x size grid, cell in texels (must divide size).
+function tileNoise(size, cell, seed) {
+  const out = new Float32Array(size * size), g = size / cell;
+  const rnd = (x, y) => { const n = Math.sin((((x % g) + g) % g) * 127.1 + (((y % g) + g) % g) * 311.7 + seed * 74.7) * 43758.5453; return n - Math.floor(n); };
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const gx = x / cell, gy = y / cell, ix = Math.floor(gx), iy = Math.floor(gy);
+    const fx = gx - ix, fy = gy - iy, sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+    const top = mix(rnd(ix, iy), rnd(ix + 1, iy), sx), bot = mix(rnd(ix, iy + 1), rnd(ix + 1, iy + 1), sx);
+    out[y * size + x] = mix(top, bot, sy);
   }
-  const t = new THREE.DataTexture(data, 4, n, THREE.RGBAFormat);
+  return out;
+}
+function dataTex(data, size, srgb = false) {
+  const t = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.colorSpace = THREE.NoColorSpace;
+  t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+  t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter;
   t.needsUpdate = true;
   return t;
+}
+
+// Bead-blasted steel: a fine, very low contrast speckle (about 1-2 px on screen at 1920) in albedo and roughness.
+// Albedo in the colour channels, roughness (0.56-0.64, plus faint rings along the length) in green of a second texture.
+function steelTextures() {
+  const n = 128, speck = tileNoise(n, 1, 3), soft = tileNoise(n, 4, 5);
+  const alb = new Uint8Array(n * n * 4), rough = new Uint8Array(n * n * 4);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+    const k = y * n + x, i = k * 4, v = speck[k] * 0.7 + soft[k] * 0.3;
+    const a = Math.round((0.955 + 0.045 * v) * 255);
+    alb[i] = alb[i + 1] = alb[i + 2] = a; alb[i + 3] = 255;
+    const ring = 0.012 * Math.sin(y * 0.9 + 1.3) * Math.sin(y * 0.23);
+    rough[i] = rough[i + 1] = rough[i + 2] = Math.round((0.56 + 0.08 * v + ring) * 255); rough[i + 3] = 255;
+  }
+  return { albedo: dataTex(alb, n, true), roughness: dataTex(rough, n) };
+}
+
+// Uncoated stock. Red: tooth and short fibres (fine, centred on 0.5). Green: a slow mottle for ink density.
+function paperTexture() {
+  const n = 256, f1 = tileNoise(n, 1, 11), f2 = tileNoise(n, 2, 12), f3 = tileNoise(n, 4, 13);
+  const m1 = tileNoise(n, 16, 21), m2 = tileNoise(n, 8, 22), m3 = tileNoise(n, 4, 23); // mottle: small cloudy grain, never a gradient
+  const tooth = new Float32Array(n * n);
+  for (let k = 0; k < n * n; k++) tooth[k] = 0.45 * f1[k] + 0.35 * f2[k] + 0.2 * f3[k];
+  // fibres: short random strokes, slightly lighter or darker than the stock
+  let seed = 7; const r = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  for (let f = 0; f < 420; f++) {
+    const x0 = r() * n, y0 = r() * n, ang = r() * Math.PI, len = 4 + r() * 9, val = (r() - 0.5) * 0.5;
+    for (let s = 0; s < len; s += 0.5) {
+      const x = Math.floor(x0 + Math.cos(ang) * s + n) % n, y = Math.floor(y0 + Math.sin(ang) * s + n) % n;
+      tooth[y * n + x] = Math.min(1, Math.max(0, tooth[y * n + x] + val * 0.5));
+    }
+  }
+  const d = new Uint8Array(n * n * 4);
+  for (let k = 0; k < n * n; k++) {
+    const i = k * 4;
+    d[i] = Math.round(tooth[k] * 255);
+    d[i + 1] = Math.round((0.5 * m1[k] + 0.3 * m2[k] + 0.2 * m3[k]) * 255);
+    d[i + 2] = 128; d[i + 3] = 255;
+  }
+  return dataTex(d, n);
 }
 
 // Soft rectangle alpha (in the green channel, for alphaMap): solid inside fx x fy of the plane, smooth falloff to the edge.
@@ -126,7 +173,7 @@ function studioEnvironment(renderer) {
     const m = new THREE.MeshBasicMaterial({ color: new THREE.Color(tint).multiplyScalar(k) }); mats.push(m);
     const o = new THREE.Mesh(box, m); o.scale.set(sx, sy, sz); o.position.set(x, y, z); room.add(o);
   };
-  panel(1.2, 0.05, 9, -0.6, 5.2, 0, 9);          // overhead strip along z: the highlight that runs along each roller
+  panel(2.4, 0.05, 9, -0.6, 5.2, 0, 4.5);        // overhead strip, broad along z: the highlight that runs along each roller
   panel(0.05, 2.4, 6, -6.8, 2.2, 0.5, 3.2);      // key side, upper left
   panel(6, 0.05, 6, 0, -1.4, 3, 0.9, 0xf2ebdd);  // paper bounce from the table in front
   panel(4, 2.2, 0.05, 1, 2.2, 6.8, 1.6);         // front fill, behind the camera
@@ -166,6 +213,8 @@ uniform sampler2D tY; uniform sampler2D tM; uniform sampler2D tC; uniform sample
 uniform vec3 inkY; uniform vec3 inkM; uniform vec3 inkC; uniform vec3 inkK;
 uniform vec4 uRoll;
 uniform float uReady;
+uniform float uMotion;
+uniform sampler2D tPaper;
 varying float vWX;
 varying vec2 vSheetUv;
 // A plate is on the sheet wherever that part of the sheet has already run under its roller.
@@ -249,12 +298,14 @@ export function mountPasses(container, { base } = {}) {
   const uniforms = {
     uSheetX: { value: X0 }, uRoll: { value: new THREE.Vector4(...STATIONS) }, uMotion: { value: 1 }, uReady: { value: 0 },
     tY: { value: plateTex.y }, tM: { value: plateTex.m }, tC: { value: plateTex.c }, tK: { value: plateTex.k },
+    tPaper: { value: null },
     inkY: { value: lin(INKS.y) }, inkM: { value: lin(INKS.m) }, inkC: { value: lin(INKS.c) }, inkK: { value: lin(INKS.k) },
   };
+  uniforms.tPaper.value = track(paperTexture());
   const paperNormal = track(paperNormalTexture());
   paperNormal.repeat.set(7, 7 * SHEET_H);
   const sheetMat = track(new THREE.MeshStandardMaterial({
-    color: PAPER, roughness: 0.93, metalness: 0, normalMap: paperNormal, normalScale: new THREE.Vector2(0.12, 0.12),
+    color: PAPER, roughness: 0.93, metalness: 0, normalMap: paperNormal, normalScale: new THREE.Vector2(0.2, 0.2),
     side: THREE.DoubleSide,
   }));
   sheetMat.onBeforeCompile = (sh) => {
@@ -278,11 +329,17 @@ export function mountPasses(container, { base } = {}) {
         #include <map_fragment>
         {
           vec2 puv = vSheetUv;
+          // Paper tooth and fibre in the stock's albedo (+-3%); the ink multiplies over it, so it shows through the print.
+          float tooth = texture2D(tPaper, puv * vec2(2.0, ${(2 * SHEET_H).toFixed(4)})).r;
+          diffuseColor.rgb *= 1.0 + 0.06 * (tooth - 0.5);
+          // Ink density mottle, +-3%: the print reads as ink laid on stock, not a vector fill.
+          float mottle = 1.0 + 0.04 * (texture2D(tPaper, puv * vec2(1.5, ${(1.5 * SHEET_H).toFixed(4)}) + 0.37).g - 0.5);
           float aY = texture2D(tY, puv).r * laid(uRoll.x), aM = texture2D(tM, puv).r * laid(uRoll.y);
           float aC = texture2D(tC, puv).r * laid(uRoll.z), aK = texture2D(tK, puv).r * laid(uRoll.w);
+          aY *= mottle; aM *= mottle; aC *= mottle; aK *= mottle;
           vec3 printed = ink(inkY, aY) * ink(inkM, aM) * ink(inkC, aC) * ink(inkK, aK);
           diffuseColor.rgb *= mix(vec3(1.0), printed, uReady);
-          vWet = uReady * max(max(aY * wetness(uRoll.x), aM * wetness(uRoll.y)), max(aC * wetness(uRoll.z), aK * wetness(uRoll.w)));
+          vWet = uReady * uMotion * max(max(aY * wetness(uRoll.x), aM * wetness(uRoll.y)), max(aC * wetness(uRoll.z), aK * wetness(uRoll.w)));
           diffuseColor.rgb *= 1.0 - 0.05 * vWet; // wet ink sits a touch denser
         }`)
       .replace('#include <roughnessmap_fragment>', `
@@ -305,15 +362,16 @@ export function mountPasses(container, { base } = {}) {
   const sheet = new THREE.Mesh(sheetGeo, sheetMat);
   scene.add(sheet);
 
-  // Rollers: four nip pairs of brushed steel. The upper (plate) roller carries a thin band of its ink at the
+  // Rollers: four nip pairs of satin steel. The upper (plate) roller carries a thin band of its ink at the
   // near end; the lower (impression) roller is plain. A clamp gap on each so the turn reads.
-  const brushed = track(brushedRoughness());
-  brushed.repeat.set(1, 3);
+  const st = steelTextures();
+  track(st.albedo); track(st.roughness);
+  st.albedo.repeat.set(1.1, 3.4); st.roughness.repeat.set(1.1, 3.4); // ~1-2 px speckle at desktop scale
   const steel = track(new THREE.MeshPhysicalMaterial({
-    color: 0x8a8d91, metalness: 0.8, roughness: 1, roughnessMap: brushed, envMap: env.texture, envMapIntensity: 1.0,
-    anisotropy: 0.65, anisotropyRotation: Math.PI / 2, // lathe-turned: the highlight pulls out along the roller axis
+    color: 0x8a8d91, map: st.albedo, metalness: 0.7, roughness: 1, roughnessMap: st.roughness, envMap: env.texture, envMapIntensity: 1.0,
+    anisotropy: 0.3, anisotropyRotation: Math.PI / 2, // satin, bead-blasted: a broad soft highlight along the axis, no streak
   }));
-  const capMat = track(new THREE.MeshStandardMaterial({ color: 0x56595e, metalness: 0.6, roughness: 0.5, envMap: env.texture, envMapIntensity: 0.7 }));
+  const capMat = track(new THREE.MeshStandardMaterial({ color: 0x55585d, map: st.albedo, metalness: 0.4, roughness: 0.72, envMap: env.texture, envMapIntensity: 0.6 }));
   const gapMat = track(new THREE.MeshStandardMaterial({ color: 0x2e3033, roughness: 0.7, metalness: 0.3, envMap: env.texture, envMapIntensity: 0.4 }));
   const rollerGeo = track(new THREE.CylinderGeometry(R, R, ROLLER_L, 48, 1));
   rollerGeo.rotateX(Math.PI / 2);
@@ -330,8 +388,8 @@ export function mountPasses(container, { base } = {}) {
     gap.position.y = R - 0.0015;
     g.add(body, gap);
     if (inkHex) {
-      // Ink band: a little glossier than the steel, as a fresh ink film on a roller is.
-      const band = new THREE.Mesh(bandGeo, track(new THREE.MeshStandardMaterial({ color: inkHex, roughness: 0.36, metalness: 0, envMap: env.texture, envMapIntensity: 0.55 })));
+      // Ink band: matte rubber.
+      const band = new THREE.Mesh(bandGeo, track(new THREE.MeshStandardMaterial({ color: inkHex, roughness: 0.8, metalness: 0, envMap: env.texture, envMapIntensity: 0.4 })));
       band.position.z = ROLLER_L / 2 - bandW / 2 - 0.03;
       g.add(band);
     }

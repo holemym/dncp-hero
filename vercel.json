@@ -1,3 +1,39 @@
 {
-  "headers": [{ "source": "/(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] }]
+  "rewrites": [
+    {
+      "source": "/befund",
+      "destination": "/pitch/DNCP-Befund-HE.html"
+    },
+    {
+      "source": "/vorschlag",
+      "destination": "/pitch/DNCP-Vorschlag-HE.html"
+    },
+    {
+      "source": "/en/befund",
+      "destination": "/pitch/DNCP-Befund-EN.html"
+    },
+    {
+      "source": "/en/vorschlag",
+      "destination": "/pitch/DNCP-Vorschlag-EN.html"
+    },
+    {
+      "source": "/DNCP-:name.html",
+      "destination": "/pitch/DNCP-:name.html"
+    },
+    {
+      "source": "/en/DNCP-:name.html",
+      "destination": "/pitch/DNCP-:name.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ]
 }
