@@ -1,0 +1,34 @@
+/* dncp · design tokens, shared by site and decks.
+   Register: press-room job ticket. Motion pack: press feed (right to left, the feed direction).
+   Palette measured from assets/original/logo-dncp-stacked-572x727.jpg. */
+:root{
+  --paper:#F6F4EF;      /* ground, uncoated stock */
+  --paper-2:#ECE9E1;    /* rule fills, quiet panels */
+  --ink:#141414;        /* text, rules, black plate */
+  --ink-2:#55534E;      /* secondary text on paper (7.0:1) */
+  --table:#3A3B3D;      /* the cutting-table grey their photos sit on */
+  --table-ink:#F6F4EF;
+  --magenta:#EF2D8E;    /* the one action colour */
+  --magenta-ink:#141414;/* text on magenta (4.8:1); magenta as text only ≥ 24px (3.5:1 on paper) */
+  --cyan:#379CC6;       /* plate only, never text (2.8:1) */
+  --yellow:#F5EA38;     /* one highlight band per page, never text */
+
+  --f-display:'Karantina', 'IBM Plex Sans Hebrew', sans-serif;
+  --f-body:'IBM Plex Sans Hebrew', system-ui, sans-serif;
+  --f-mono:'IBM Plex Mono', 'IBM Plex Sans Hebrew', monospace; /* Hebrew falls to Plex Sans, never to a system mono */
+
+  --body:1.0625rem;                         /* 17px */
+  --small:.875rem;
+  --h3:clamp(1.5rem,1.1rem + 1.4vw,2.25rem);
+  --h2:clamp(3.5rem,2rem + 7vw,9rem);       /* Karantina is condensed: needs size */
+  --display:clamp(6rem,2rem + 17vw,19rem);  /* ≥ 8× body at desktop */
+
+  --gutter:clamp(1rem,.5rem + 2.5vw,3rem);
+  --max:1440px;
+  --rule:1px solid var(--ink);
+  --radius:2px;
+
+  --ease-feed:cubic-bezier(.22,1,.36,1);
+  --t-reveal:900ms;
+  --t-hover:220ms;
+}
