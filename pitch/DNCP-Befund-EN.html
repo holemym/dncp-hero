@@ -235,6 +235,14 @@ code,.ltr{direction:ltr;unicode-bidi:isolate;font-family:var(--f-mono)}
 .bleed--hero .strip img{width:200px}
 .bleed--hero .bleed__text{background:var(--table);color:var(--table-ink)}
 .body[data-gap]{margin-top:40px}
+.rows--big{margin-top:64px}
+.rows--big li{padding:30px 0}
+.rows--big code{font-size:38px}
+.rows--big .bad{font-size:28px}
+.split--wide .cap--order{height:500px}
+:lang(en) .rows--big{margin-top:40px}
+:lang(en) .rows--big li{padding:18px 0}
+.bleed--hero .strip{padding-top:24px}
 
 </style>
 </head>
@@ -272,16 +280,12 @@ code,.ltr{direction:ltr;unicode-bidi:isolate;font-family:var(--f-mono)}
 
 <section class="sheet">
   <div class="slug"><span>New City Print</span><span>///</span><span>What the website says today</span><span class="n ltr">03</span></div>
-  <div class="stack">
   <h2 class="h h--l">The WhatsApp button on mobile goes to a wrong number</h2>
-  <div class="push">
-  <ul class="rows">
+  <ul class="rows rows--big">
     <li><code>wa.me/972026661966</code><span class="bad">no 0 after +972</span></li>
     <li><code>tel:+97202-6661966</code><span class="bad">the same error when dialling</span></li>
   </ul>
   <p class="body" data-gap>The other button goes to 02-6661966, a landline. If that line is not on WhatsApp°, neither button opens a chat.</p>
-  </div>
-  </div>
   <p class="legend">° Not yet verified</p>
 </section>
 
