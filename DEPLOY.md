@@ -8,6 +8,7 @@
 |---|---|
 | `/` | the hero alone (four-passes press), for quick sharing |
 | `/home/` | the full homepage (`/home` redirects to `/home/`, needed for relative assets) |
+| `/home-vprint/` | the homepage with the order planner and the file check (`/home-vprint` redirects to `/home-vprint/`) |
 | `/befund` · `/en/befund` | Befund deck, Hebrew · English (10 slides) |
 | `/vorschlag` · `/en/vorschlag` | "Paths" deck, Hebrew · English (9 slides) |
 `vercel.json` carries the redirect, the rewrites and `X-Robots-Tag: noindex, nofollow` on every path; `robots.txt` disallows all; `.vercelignore` keeps `*.md` and the licensed stock originals (`img/DTS_*`) out of the deployment.
@@ -21,7 +22,7 @@ This repo holds only the deploy, so keeping it git-connected is fine (unlike cla
 
 ## Check after every deploy
 - `curl -sI <url>/ | grep -i x-robots-tag` → `noindex, nofollow`
-- `<url>/`, `<url>/home`, `<url>/befund`, `<url>/en/befund`, `<url>/vorschlag`, `<url>/en/vorschlag` → 200; `/home` → 307 to `/home/`
+- `<url>/`, `<url>/home`, `<url>/home-vprint`, `<url>/befund`, `<url>/en/befund`, `<url>/vorschlag`, `<url>/en/vorschlag` → 200; `/home` → 307 to `/home/`
 - `<url>/README.md` and `<url>/img/DTS_MISC_1_(NICK_FANCHER)_Nick_Fancher_Photos_ID10481.jpg` → 404
 - In a browser: the press runs on scroll at `/`; the logos show at `/home/`; a deck opens on slide 1 and the EN switch keeps the slide.
 

@@ -4,6 +4,11 @@
       "source": "/home",
       "destination": "/home/",
       "permanent": false
+    },
+    {
+      "source": "/home-vprint",
+      "destination": "/home-vprint/",
+      "permanent": false
     }
   ],
   "rewrites": [
