@@ -51,7 +51,7 @@ h1,h2,h3,p,ol,ul,figure{margin:0;padding:0}
 ol,ul{list-style:none}
 code,.ltr{direction:ltr;unicode-bidi:isolate;font-family:var(--f-mono)}
 .deck{position:fixed;inset:0;display:grid;place-items:center}
-.sheet{position:absolute;width:1600px;height:900px;background:var(--paper);transform-origin:center;opacity:0;pointer-events:none;transition:opacity .35s var(--ease-feed);overflow:hidden;padding:56px 72px 64px}
+.sheet{position:absolute;left:50%;top:50%;width:1600px;height:900px;background:var(--paper);transform-origin:center;opacity:0;pointer-events:none;transition:opacity .35s var(--ease-feed);overflow:hidden;padding:56px 72px 64px}
 .sheet.on{opacity:1;pointer-events:auto}
 .slug{position:absolute;inset-inline:72px;top:24px;display:flex;gap:18px;font:400 14px/1 var(--f-mono);color:var(--ink-2);padding-bottom:10px;border-bottom:1px solid var(--ink-2)}
 .slug .n{margin-inline-start:auto}
@@ -114,7 +114,7 @@ code,.ltr{direction:ltr;unicode-bidi:isolate;font-family:var(--f-mono)}
   @page{size:1600px 900px;margin:0}
   html,body{height:auto;overflow:visible;background:none}
   .deck{position:static;display:block}
-  .sheet{position:relative;opacity:1;transform:none!important;page-break-after:always;break-after:page}
+  .sheet{position:relative;left:auto;top:auto;opacity:1;transform:none!important;page-break-after:always;break-after:page}
   .nav{display:none}
 }
 .nav{top:10px;bottom:auto;inset-inline-end:10px;background:var(--ink);color:var(--paper);opacity:1;padding:6px 9px;text-decoration:none;font-size:13px}
@@ -227,7 +227,7 @@ code,.ltr{direction:ltr;unicode-bidi:isolate;font-family:var(--f-mono)}
 .ov__t{display:block;position:relative;aspect-ratio:16/9;overflow:hidden;outline:1px solid rgba(246,244,239,.25)}
 .ov__grid button.cur .ov__t{outline:3px solid var(--magenta)}
 .ov__grid button:hover .ov__t,.ov__grid button:focus-visible .ov__t{outline:3px solid var(--paper)}
-.sheet.thumb{visibility:visible;opacity:1;position:absolute;top:0;inset-inline-start:0;transform-origin:0 0;pointer-events:none}
+.sheet.thumb{visibility:visible;opacity:1;position:absolute;left:auto;right:auto;top:0;inset-inline-start:0;transform-origin:0 0;pointer-events:none}
 :root[dir="rtl"] .sheet.thumb{transform-origin:100% 0}
 .livepanel{position:fixed;top:48px;inset-inline-end:10px;z-index:35;background:var(--paper);color:var(--ink);padding:14px 18px;min-width:260px;
   box-shadow:0 0 0 1px var(--ink);display:none;font:400 16px/1.4 var(--f-body)}
@@ -566,7 +566,7 @@ code,.ltr{direction:ltr;unicode-bidi:isolate;font-family:var(--f-mono)}
   function fit() {
     const w = presenting ? innerWidth * 0.62 : innerWidth;
     const k = Math.min(w / 1600, innerHeight / 900);
-    sheets.forEach(el => (el.style.transform = `scale(${k})`));
+    sheets.forEach(el => (el.style.transform = `translate(-50%, -50%) scale(${k})`));
     scaleThumbs();
   }
   const who = (params.get('for') || '').trim().slice(0, 80);
