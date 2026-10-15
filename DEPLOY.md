@@ -10,7 +10,7 @@
 | `/home/` | the full homepage (`/home` redirects to `/home/`, needed for relative assets) |
 | `/home-vprint/` | the homepage with the order planner and the file check (`/home-vprint` redirects to `/home-vprint/`) |
 | `/befund` · `/en/befund` | Befund deck, Hebrew · English (10 slides) |
-| `/vorschlag` · `/en/vorschlag` | "Paths" deck, Hebrew · English (9 slides) |
+| `/vorschlag` · `/en/vorschlag` | the offer ("הצעה"), Hebrew · English (9 slides: packages A/B/C, monthly Google tiers, extras) |
 `vercel.json` carries the redirect, the rewrites and `X-Robots-Tag: noindex, nofollow` on every path; `robots.txt` disallows all; `.vercelignore` keeps `*.md` and the licensed stock originals (`img/DTS_*`) out of the deployment.
 
 ## First deploy
