@@ -337,6 +337,68 @@ code,.ltr{direction:ltr;unicode-bidi:isolate;font-family:var(--f-mono)}
 .cover--paths{grid-template-rows:1fr auto}
 .matrix{margin-top:44px}
 .matrix .row:not(.row--head){padding:18px 0}
+.saw{display:grid;grid-template-columns:minmax(0,1fr) 1000px;gap:56px;height:100%;align-items:center}
+.saw .cap{height:430px}
+.saw .body{margin-top:32px;font-size:24px}
+.offer{position:relative;display:grid;grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,1fr));grid-template-rows:repeat(14,auto);margin-top:18px}
+.offer>.cell{position:relative;z-index:1;padding:8px 22px;border-bottom:1px solid rgba(85,83,78,.45);font-size:18px;line-height:1.3}
+.offer>.lab{padding-inline-start:0;font-weight:600}
+.offer .lab small{font-weight:400;font-size:15px;color:var(--ink-2)}
+.offer .a,.offer .c{color:var(--ink-2)}
+.offer .b{color:var(--paper);font-weight:600;border-bottom-color:rgba(246,244,239,.28)}
+.offer .no{color:rgba(85,83,78,.7)}
+.offer .b.no{color:rgba(246,244,239,.55);font-weight:400}
+.offer__ground{grid-column:3;grid-row:1 / -1;background:var(--table);margin:-30px 0 -10px;z-index:0}
+.offer>.head{align-self:end;padding-bottom:12px;border-bottom:2px solid var(--ink)}
+.offer>.head.b{border-bottom-color:var(--paper)}
+.offer>.head.lab .h{margin:0;font-size:92px}
+.pk{display:block;font:700 64px/.8 var(--f-display)}
+.pk-name{display:block;font-size:18px;font-weight:600;margin-top:8px}
+.badge{display:inline-block;margin-bottom:14px;background:var(--magenta);color:var(--magenta-ink);font:600 15px/1 var(--f-body);padding:6px 10px;border-radius:2px}
+.offer>.price{border-bottom:0;padding-top:16px;font:700 44px/1 var(--f-display)}
+.offer>.price.b{font-size:66px}
+.offer>.price.lab{font:600 18px/1.3 var(--f-body);align-self:end;padding-bottom:12px}
+.offer + .src{margin-top:22px}
+.pricebig{font:700 92px/.9 var(--f-display)}
+.pricebig small{display:block;margin-top:10px;font:400 18px/1.3 var(--f-body);color:var(--ink-2)}
+.ac{display:grid;grid-template-columns:400px minmax(0,1fr) 400px;column-gap:64px;margin-top:64px;align-items:stretch}
+.ac__col h3{font:700 60px/.92 var(--f-display)}
+.ac__col .price{display:block;margin-top:12px;font:700 44px/1 var(--f-display);color:var(--ink-2)}
+.ac__col p{margin-top:22px;padding-top:16px;border-top:1px solid var(--ink-2);font-size:20px;line-height:1.5;color:var(--ink-2)}
+.ac__mid{border-inline:2px solid var(--ink);display:flex;align-items:center;padding:40px 48px}
+.ac__mid p{font:700 66px/.98 var(--f-display)}
+.monthly{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:64px}
+.monthly>div{padding:28px 34px 34px;border-top:1px solid rgba(246,244,239,.45)}
+.monthly>.mid{background:var(--paper);color:var(--ink);margin-top:-32px;padding-top:60px;border-top:0}
+.monthly b{display:block;font:700 50px/1 var(--f-display)}
+.monthly .per{display:block;margin:16px 0 20px;font:700 40px/1 var(--f-display)}
+.monthly .mid .per{font-size:62px}
+.monthly p{font-size:19px;line-height:1.5}
+.monthly .mid .badge{margin-bottom:16px}
+.sheet--dark .src{color:var(--paper-2)}
+.monthly + .src{margin-top:28px}
+.ledger--price li{font-size:28px;align-items:baseline}
+.ledger--price b{font-size:56px}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:44px;margin-top:72px}
+.steps li{border-top:2px solid var(--ink);padding-top:18px}
+.steps .no{display:block;margin-bottom:24px;font:700 120px/.8 var(--f-display);color:var(--cyan)}
+.steps b{display:block;margin-bottom:12px;font:700 42px/1 var(--f-display)}
+.steps .t{font-size:20px;line-height:1.5}
+.pay{margin-top:64px;padding:20px 0;border-block:1px solid var(--ink);font-size:24px}
+.lead{margin-top:56px;font:700 104px/.9 var(--f-display);max-width:1300px}
+.reco2{margin-top:32px;max-width:960px;font-size:26px;line-height:1.5}
+.sheet--dark .nextstep{margin-top:64px}
+.offer>.lab{grid-column:1}.offer>.a{grid-column:2}.offer>.b{grid-column:3}.offer>.c{grid-column:4}
+.saw .h--l{font-size:120px}
+.offer>.price{align-self:end;padding-bottom:14px}
+.saw{grid-template-columns:minmax(0,1fr) 880px}
+.saw .cap{height:378px}
+.saw .h--l{font-size:108px}
+.ac{margin-top:88px}
+.ac__col p{font-size:22px}
+.ac__mid p{font-size:80px}
+.ac__mid{padding:56px 48px}
+.monthly{margin-top:88px}
 </style>
 </head>
 <body>
